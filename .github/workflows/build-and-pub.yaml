@@ -47,8 +47,8 @@ jobs:
                curl -X POST "http://100.27.46.24:8080/api/v2/engagements/" \
                -H  "accept: application/json" -H  "Content-Type: multipart/form-data"  \
                -H "Authorization: Token ${{secrets.DOJO_TOKEN}}" \
-               -F "status=In Progress" -F "product=2" -F "name=${{secrets.REPO_NAME}}${{ steps.date.outputs.date }}" \
-               -F "target_end=2022-07-17" -F "target_start=2022-07-04" 
+               -F "status=In Progress" -F "product=2" -F "name=evil-go-app${{ steps.date.outputs.date }}" \
+               -F "target_end=2022-07-17" -F "target_start=2022-07-04"
 
       - name: Publish results in DefectDojo
         run: |
@@ -62,8 +62,8 @@ jobs:
               -F "scan_type=Trivy Scan" \
               -F "close_old_findings=true" \
               -F "file=@${{secrets.REPO_NAME}}-results.json" \
-              -F "product_name=${{secrets.REPO_NAME}}" \
-              -F "engagement_name=${{secrets.REPO_NAME}}${{ steps.date.outputs.date }}"
+              -F "product_name=evil-go-app" \
+              -F "engagement_name=evil-go-app${{ steps.date.outputs.date }}"
 
       - name: Docker Push
         run: docker push $DOCKER_USER/$REPO_NAME:${{ steps.date.outputs.date }}
