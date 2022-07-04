@@ -5,7 +5,7 @@ COPY . /app
 
 RUN CGO_ENABLED=1 GO111MODULES=on go build -ldflags="-s -w" .
 
-FROM gcr.io/distroless/base
+FROM golang:1.14.3
 
 WORKDIR /app
 COPY --from=builder /app/evil-go-app /app
