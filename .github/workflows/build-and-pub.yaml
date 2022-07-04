@@ -9,6 +9,7 @@ env:
   DOCKER_USER: ${{secrets.DOCKER_USER}}
   DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
   REPO_NAME: ${{secrets.REPO_NAME}}
+  DOJO_TOKEN: ${{secrets.DOJO_TOKEN}}
 
 jobs:
   push-image-to-docker-hub:
@@ -33,12 +34,36 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: '${{secrets.DOCKER_USER}}/${{secrets.REPO_NAME}}:${{ steps.date.outputs.date }}'
-          format: 'table'
+          format: 'json'
+          output: '${{secrets.REPO_NAME}}-results.json'
           exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
           security-checks: 'vuln,secret'
           severity: 'CRITICAL,HIGH'
+
+      - name: Create Dojo Engagement
+        run: |
+               curl -X POST "http://100.27.46.24:8080/api/v2/engagements/" \
+               -H  "accept: application/json" -H  "Content-Type: multipart/form-data"  \
+               -H "Authorization: Token ${{secrets.DOJO_TOKEN}}" \
+               -F "status=In Progress" -F "product=2" -F "name=${{secrets.REPO_NAME}}-${{ steps.date.outputs.date }}" \
+               -F "target_end=2022-07-17" -F "target_start=2022-07-04" 
+
+      - name: Publish results in DefectDojo
+        run: |
+              curl -X POST "http://100.27.46.24:8080/api/v2/import-scan/" \
+              -H  "accept: application/json" -H  \
+              "Content-Type: multipart/form-data"  \
+              -H "Authorization: Token ${{secrets.DOJO_TOKEN}}" \
+              -F "minimum_severity=Info" \
+              -F "active=true" \
+              -F "verified=true" \
+              -F "scan_type=Trivy Scan" \
+              -F "close_old_findings=true" \
+              -F "file=@${{secrets.REPO_NAME}}-results.json" \
+              -F "product_name=${{secrets.REPO_NAME}}" \
+              -F "engagement_name=${{secrets.REPO_NAME}}-${{ steps.date.outputs.date }}"
 
       - name: Docker Push
         run: docker push $DOCKER_USER/$REPO_NAME:${{ steps.date.outputs.date }}
