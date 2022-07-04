@@ -35,7 +35,7 @@ jobs:
         with:
           image-ref: '${{secrets.DOCKER_USER}}/${{secrets.REPO_NAME}}:${{ steps.date.outputs.date }}'
           format: 'json'
-          output: '${{secrets.REPO_NAME}}-results.json'
+          output: 'evil-go-api-results.json'
           exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
@@ -61,7 +61,7 @@ jobs:
               -F "verified=true" \
               -F "scan_type=Trivy Scan" \
               -F "close_old_findings=true" \
-              -F "file=@${{secrets.REPO_NAME}}-results.json" \
+              -F "file=@evil-go-app-results.json" \
               -F "product_name=evil-go-app" \
               -F "engagement_name=evil-go-app${{ steps.date.outputs.date }}"
 
