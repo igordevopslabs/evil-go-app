@@ -1,4 +1,4 @@
-name: Build & Publish
+name: Build and Publish
 
 on:
   push:
@@ -10,6 +10,26 @@ env:
   DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
   REPO_NAME: ${{secrets.REPO_NAME}}
   DOJO_TOKEN: ${{secrets.DOJO_TOKEN}}
+  DEFECTDOJO_ENGAGEMENT_PERIOD: 5
+  DEFECTDOJO_ENGAGEMENT_STATUS: "Not Started"
+  DEFECTDOJO_ENGAGEMENT_BUILD_SERVER: "null"
+  DEFECTDOJO_ENGAGEMENT_SOURCE_CODE_MANAGEMENT_SERVER: "null"
+  DEFECTDOJO_ENGAGEMENT_ORCHESTRATION_ENGINE: "null"
+  DEFECTDOJO_ENGAGEMENT_DEDUPLICATION_ON_ENGAGEMENT: "false"
+  DEFECTDOJO_ENGAGEMENT_THREAT_MODEL: "true"
+  DEFECTDOJO_ENGAGEMENT_API_TEST: "true"
+  DEFECTDOJO_ENGAGEMENT_PEN_TEST: "true"
+  DEFECTDOJO_ENGAGEMENT_CHECK_LIST: "true"
+  DEFECTDOJO_NOT_ON_MASTER: "false"
+  DEFECTDOJO_SCAN_MINIMUM_SEVERITY: "Medium"
+  DEFECTDOJO_SCAN_ACTIVE: "true"
+  DEFECTDOJO_SCAN_VERIFIED: "true"
+  DEFECTDOJO_SCAN_CLOSE_OLD_FINDINGS: "true"
+  DEFECTDOJO_SCAN_PUSH_TO_JIRA: "false"
+  DEFECTDOJO_SCAN_ENVIRONMENT: "Default"
+  DEFECTDOJO_URL: "https://demo.defectdojo.org/api/v2"
+  DEFECTDOJO_PRODUCTID: 6
+
 
 jobs:
   push-image-to-docker-hub:
@@ -23,9 +43,10 @@ jobs:
         id: dockerLogin
         run: | 
           docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
-      - name: Get current date 
+
+      - name: Get current date
         id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d--%M-%S')"
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
 
       - name: Build the Docker image # push The image to the docker hub
         run: docker build . --file Dockerfile --tag $DOCKER_USER/$REPO_NAME:${{ steps.date.outputs.date }}
@@ -35,7 +56,7 @@ jobs:
         with:
           image-ref: '${{secrets.DOCKER_USER}}/${{secrets.REPO_NAME}}:${{ steps.date.outputs.date }}'
           format: 'json'
-          output: 'evil-go-api-results.json'
+          output: '${{secrets.REPO_NAME}}-results.json'
           exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
@@ -44,15 +65,38 @@ jobs:
 
       - name: Create Dojo Engagement
         run: |
-               curl -X POST "http://100.27.46.24:8080/api/v2/engagements/" \
-               -H  "accept: application/json" -H  "Content-Type: multipart/form-data"  \
-               -H "Authorization: Token ${{secrets.DOJO_TOKEN}}" \
-               -F "status=In Progress" -F "product=2" -F "name=${{secrets.REPO_NAME}}${{ steps.date.outputs.date }}" \
-               -F "target_end=2022-07-17" -F "target_start=2022-07-04" 
+              curl --fail --location --request POST "${DEFECTDOJO_URL}/engagements/" \
+              --header "Authorization: Token ${{secrets.DOJO_TOKEN}}" \
+              --header 'Content-Type: application/json' \
+                --data-raw "{
+                  \"tags\": [\"${GITHUB_WORKFLOW}\"],
+                  \"name\": \"GITHUB-BUILD-ID-${GITHUB_RUN_ID}\",
+                  \"description\": \"${GITHUB_EVENT_NAME}\",
+                  \"version\": \"${GITHUB_REF}\",
+                  \"first_contacted\": \"${{ steps.date.outputs.date }}\",
+                  \"target_start\": \"${{ steps.date.outputs.date }}\",
+                  \"target_end\": \"2022-07-17\",
+                  \"threat_model\": \"${DEFECTDOJO_ENGAGEMENT_THREAT_MODEL}\",
+                  \"api_test\": \"${DEFECTDOJO_ENGAGEMENT_API_TEST}\",
+                  \"pen_test\": \"${DEFECTDOJO_ENGAGEMENT_PEN_TEST}\",
+                  \"check_list\": \"${DEFECTDOJO_ENGAGEMENT_CHECK_LIST}\",
+                  \"status\": \"${DEFECTDOJO_ENGAGEMENT_STATUS}\",
+                  \"engagement_type\": \"CI/CD\",
+                  \"build_id\": \"${GITHUB_RUN_ID}\",
+                  \"commit_hash\": \"${GITHUB_SHA}\",
+                  \"branch_tag\": \"${GITHUB_REF}\",
+                  \"deduplication_on_engagement\": \"${DEFECTDOJO_ENGAGEMENT_DEDUPLICATION_ON_ENGAGEMENT}\",
+                  \"product\": \"${DEFECTDOJO_PRODUCTID}\",
+                  \"source_code_management_uri\": \"${GITHUB_SERVER_URL}\",
+                  \"build_server\": ${DEFECTDOJO_ENGAGEMENT_BUILD_SERVER},
+                  \"source_code_management_server\": ${DEFECTDOJO_ENGAGEMENT_SOURCE_CODE_MANAGEMENT_SERVER},
+                  \"orchestration_engine\": ${DEFECTDOJO_ENGAGEMENT_ORCHESTRATION_ENGINE}
+                }" | jq -r '.id'
+
 
       - name: Publish results in DefectDojo
         run: |
-              curl -X POST "http://100.27.46.24:8080/api/v2/import-scan/" \
+              curl -X POST "${DEFECTDOJO_URL}/import-scan/" \
               -H  "accept: application/json" -H  \
               "Content-Type: multipart/form-data"  \
               -H "Authorization: Token ${{secrets.DOJO_TOKEN}}" \
@@ -60,10 +104,10 @@ jobs:
               -F "active=true" \
               -F "verified=true" \
               -F "scan_type=Trivy Scan" \
-              -F "close_old_findings=true" \
+              -F "close_old_findings=${DEFECTDOJO_SCAN_CLOSE_OLD_FINDINGS}" \
               -F "file=@${{secrets.REPO_NAME}}-results.json" \
               -F "product_name=${{secrets.REPO_NAME}}" \
-              -F "engagement_name=${{secrets.REPO_NAME}}${{ steps.date.outputs.date }}"
+              -F "engagement_name=GITHUB-BUILD-ID-${GITHUB_RUN_ID}"
 
       - name: Docker Push
         run: docker push $DOCKER_USER/$REPO_NAME:${{ steps.date.outputs.date }}
