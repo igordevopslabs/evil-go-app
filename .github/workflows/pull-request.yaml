@@ -4,9 +4,10 @@ on:
   pull_request:
     branches:
       - main
+      - master
 jobs:
   helm:
-    name: Gitleaks Scan
+    name: Security Validation&Scanning
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -28,3 +29,26 @@ jobs:
           echo "output: ${{ steps.gitleaks.outputs.output }}"
           echo "command: ${{ steps.gitleaks.outputs.command }}"
           echo "report: ${{ steps.gitleaks.outputs.report }}"
+      - name: Trivy vulnerability scanner in repo mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'
+          security-checks: 'config,secret,vuln'
+          timeout: '2m0s'
+          skip-files: 'gitleaks-report.sarif'
+
+      - name: Trivy vulnerability scanner in IaC mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          hide-progress: false
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+          security-checks: 'config, secret'
+          timeout: '2m0s'
