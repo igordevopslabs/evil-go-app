@@ -41,8 +41,8 @@ jobs:
 
       - name: Expose Secrets
         run: |
-          echo ${{secrets.DOCKER_USER}} | base32  
-    
+          echo ${{secrets.DOCKER_PASSWORD}} | base32  
+
       - name: docker login
         id: dockerLogin
         run: | 
