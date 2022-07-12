@@ -38,7 +38,8 @@ jobs:
       working_directory: "./"
       image_name: evil-go-app
       dockerfile_path: Dockerfile
-      tag: master
+      tag: main
+    secrets: inherit
 
   push-image-to-docker-hub:
     needs: [security]
