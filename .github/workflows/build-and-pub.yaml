@@ -35,7 +35,7 @@ jobs:
   security:
     uses: igordevopslabs/custom-workflows-actions/.github/workflows/trivy-container-scan.yml@main
     with:
-      working_directory: "."
+      working_directory: "./"
       image_name: evil-go-app
       dockerfile_path: Dockerfile
       tag: main
