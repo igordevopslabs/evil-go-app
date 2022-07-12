@@ -32,7 +32,16 @@ env:
 
 
 jobs:
+  security:
+    uses: igordevopslabs/custom-workflows-actions/.github/workflows/trivy-container-scan.yml@main
+    with:
+      working_directory: "./"
+      image_name: evil-go-app
+      dockerfile_path: Dockerfile
+      tag: master
+
   push-image-to-docker-hub:
+    needs: [security]
     name: Build Docker Image
     runs-on: ubuntu-latest
     steps:
