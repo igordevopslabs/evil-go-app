@@ -1,0 +1,26 @@
+name: Security Validation
+
+on:
+  push:
+    branches:
+      - main
+      - master
+jobs:
+  secret-scanning:
+    uses: igordevopslabs/custom-workflows-actions/.github/workflows/gitleaks-scan.yml@main
+    secrets: inherit
+
+  security-fs:
+    needs: [secret-scanning]
+    uses: igordevopslabs/custom-workflows-actions/.github/workflows/trivy-fs-scan.yml@main
+    with:
+      application_name: evil-go-app
+      skipp_file: gitleaks-report.sarif
+    secrets: inherit
+
+  security-iac:
+    needs: [secret-scanning, security-fs]
+    uses: igordevopslabs/custom-workflows-actions/.github/workflows/trivy-iac-scan.yml@main
+    with:
+      application_name: evil-go-app
+    secrets: inherit
