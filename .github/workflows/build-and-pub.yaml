@@ -32,26 +32,28 @@ env:
 
 
 jobs:
+  security-iac:
+    uses: igordevopslabs/custom-workflows-actions/.github/workflows/trivy-iac-scan.yml@main
+    with:
+      application_name: evil-go-app
+    secrets: inherit
+
   security:
     uses: igordevopslabs/custom-workflows-actions/.github/workflows/trivy-container-scan.yml@main
     with:
-      working_directory: "."
+      working_directory: "./"
       image_name: evil-go-app
       dockerfile_path: Dockerfile
       tag: main
     secrets: inherit
 
   push-image-to-docker-hub:
-    needs: [security]
+    needs: [security-iac, security]
     name: Build Docker Image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Application Repository
         uses: actions/checkout@v2
-
-      - name: Expose Secrets
-        run: |
-          echo ${{secrets.DOCKER_PASSWORD}} | base32  
 
       - name: docker login
         id: dockerLogin
