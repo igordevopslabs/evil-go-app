@@ -34,8 +34,6 @@ env:
 jobs:
   security-iac:
     uses: igordevopslabs/custom-workflows-actions/.github/workflows/trivy-iac-scan.yml@main
-    with:
-      application_name: evil-go-app
     secrets: inherit
 
   security:
