@@ -23,5 +23,4 @@ EXPOSE 8080
 
 #avoid rootless
 
-
 ENTRYPOINT ["/app/evil-go-app"]
