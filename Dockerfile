@@ -27,4 +27,6 @@ COPY --from=builder /app/evil-go-app /app
 
 EXPOSE 8080
 
+USER appuser:appuser
+
 ENTRYPOINT ["/app/evil-go-app"]
