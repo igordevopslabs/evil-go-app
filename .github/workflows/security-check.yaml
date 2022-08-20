@@ -10,6 +10,10 @@ on:
       - main
       - master
 
+concurrency:
+  group: security-checks-${{ github.head_ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   pull-requests: read
@@ -20,13 +24,19 @@ jobs:
     secrets: inherit
 
   security-fs:
-    needs: [secret-scanning]
     uses: igordevopslabs/custom-workflows-actions/.github/workflows/trivy-fs-scan.yml@main
     with:
       skipp_file: gitleaks-report.sarif
     secrets: inherit
 
   security-iac:
-    needs: [secret-scanning, security-fs]
     uses: igordevopslabs/custom-workflows-actions/.github/workflows/trivy-iac-scan.yml@main
+    secrets: inherit
+
+  container-scan:
+    uses: igordevopslabs/custom-workflows-actions/.github/workflows/container_scan.yml@main
+    with:
+      app_name: ${{ github.event.repository.name }}
+      app_path: 'cmd/api'
+      tag: ${{ github.sha }}
     secrets: inherit
