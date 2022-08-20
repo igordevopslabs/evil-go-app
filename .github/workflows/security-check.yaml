@@ -38,5 +38,4 @@ jobs:
     with:
       app_name: ${{ github.event.repository.name }}
       app_path: 'cmd/api'
-      tag: ${{ github.sha }}
     secrets: inherit
