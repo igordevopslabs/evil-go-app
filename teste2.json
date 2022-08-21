@@ -1,0 +1,102 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "evil-go-app-test:v1",
+  "ArtifactType": "container_image",
+  "Metadata": {
+    "OS": {
+      "Family": "ubuntu",
+      "Name": "20.04"
+    },
+    "ImageID": "sha256:ad78ad3a95209de288fc60d92f80b613e2532468a1aff3c2f19ad46d37fa030e",
+    "DiffIDs": [
+      "sha256:c3f11d77a5de76ec836c52333d45ac3742c7b27d3d83feba6ec978e223715c67",
+      "sha256:4060decef1d55e81ceb37ba023ebc568937e1ddff9eb64765981723df3a4116e",
+      "sha256:70294611b66542cc05dd66e34ed6861591fec1fe9caf42e8ce06ed36e4335de8",
+      "sha256:2247542c62f9d8449a2f1176a0557393ced3514eec3195558254236170acec01"
+    ],
+    "RepoTags": [
+      "evil-go-app-test:v1"
+    ],
+    "ImageConfig": {
+      "architecture": "amd64",
+      "container": "e3e17eec3484263e118af1c13e2039d182b020b4aac65e9208bcaf72359c7b26",
+      "created": "2022-08-20T23:59:03.09259454Z",
+      "docker_version": "20.10.17",
+      "history": [
+        {
+          "created": "2022-08-02T01:30:49Z",
+          "created_by": "/bin/sh -c #(nop) ADD file:af4cf77e6818016b697a1491101b40c71d06529ced65f36107749f099d6d4bdc in / "
+        },
+        {
+          "created": "2022-08-02T01:30:49Z",
+          "created_by": "/bin/sh -c #(nop)  CMD [\"bash\"]",
+          "empty_layer": true
+        },
+        {
+          "created": "2022-08-20T23:24:59Z",
+          "created_by": "/bin/sh -c apt-get update -y     \u0026\u0026 DEBIAN_FRONTEND=noninteractive apt-get install locales tzdata openssl ca-certificates -y     \u0026\u0026 /usr/sbin/update-ca-certificates     \u0026\u0026 locale-gen en_US.UTF-8 pt_BR.UTF-8"
+        },
+        {
+          "created": "2022-08-20T23:25:14Z",
+          "created_by": "/bin/sh -c #(nop)  ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8 DEBIAN_FRONTEND=noninteractive",
+          "empty_layer": true
+        },
+        {
+          "created": "2022-08-20T23:25:38Z",
+          "created_by": "/bin/sh -c useradd --create-home --uid 1000 gopher"
+        },
+        {
+          "created": "2022-08-20T23:25:45Z",
+          "created_by": "/bin/sh -c #(nop) WORKDIR /home/gopher",
+          "empty_layer": true
+        },
+        {
+          "created": "2022-08-20T23:25:52Z",
+          "created_by": "/bin/sh -c #(nop)  USER 1000",
+          "empty_layer": true
+        },
+        {
+          "created": "2022-08-20T23:31:37Z",
+          "created_by": "/bin/sh -c #(nop) COPY dir:7fc432928dbdb96dd376328d8ed8fd9dc99cc9ad8f9751ef1760e1e9dccb2f30 in ./ "
+        },
+        {
+          "created": "2022-08-20T23:59:03Z",
+          "created_by": "/bin/sh -c #(nop)  CMD [\"./evil-go-app-bin\"]",
+          "empty_layer": true
+        }
+      ],
+      "os": "linux",
+      "rootfs": {
+        "type": "layers",
+        "diff_ids": [
+          "sha256:c3f11d77a5de76ec836c52333d45ac3742c7b27d3d83feba6ec978e223715c67",
+          "sha256:4060decef1d55e81ceb37ba023ebc568937e1ddff9eb64765981723df3a4116e",
+          "sha256:70294611b66542cc05dd66e34ed6861591fec1fe9caf42e8ce06ed36e4335de8",
+          "sha256:2247542c62f9d8449a2f1176a0557393ced3514eec3195558254236170acec01"
+        ]
+      },
+      "config": {
+        "Cmd": [
+          "./evil-go-app-bin"
+        ],
+        "Env": [
+          "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "LANG=en_US.UTF-8",
+          "LANGUAGE=en_US:en",
+          "LC_ALL=en_US.UTF-8",
+          "DEBIAN_FRONTEND=noninteractive"
+        ],
+        "Image": "sha256:d468c1e55d9261e6969124dca6c02c383ebf5ea1e21281baf3a196ca945d0a91",
+        "User": "1000",
+        "WorkingDir": "/home/gopher"
+      }
+    }
+  },
+  "Results": [
+    {
+      "Target": "evil-go-app-test:v1 (ubuntu 20.04)",
+      "Class": "os-pkgs",
+      "Type": "ubuntu"
+    }
+  ]
+}
