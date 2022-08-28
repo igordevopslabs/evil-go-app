@@ -39,3 +39,10 @@ jobs:
       app_name: ${{ github.event.repository.name }}
       app_path: 'cmd/api'
     secrets: inherit
+
+  vilicus-scab:
+    uses: igordevopslabs/custom-workflows-actions/.github/workflows/container_scan2.yml@main
+    with:
+      app_name: ${{ github.event.repository.name }}
+      app_path: 'cmd/api'
+    secrets: inherit
