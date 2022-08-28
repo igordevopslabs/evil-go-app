@@ -45,4 +45,5 @@ jobs:
     with:
       app_name: ${{ github.event.repository.name }}
       app_path: 'cmd/api'
+      severity_threshold: CRITICAL
     secrets: inherit
