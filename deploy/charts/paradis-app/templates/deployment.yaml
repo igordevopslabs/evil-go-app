@@ -1,0 +1,89 @@
+{{- if .Values.createDeployment }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "paradisApp.helmLabels" . | nindent 4 }}
+  annotations:
+{{ toYaml .Values.deploymentAnnotations | indent 8 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "paradisApp.helmLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "paradisApp.helmLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Release.Name }}
+          image: "{{ .Values.container.image.repository }}:{{ .Values.container.image.tag | default .Chart.AppVersion }}"
+          {{- if .Values.containerCommand }}
+          command: {{ .Values.container.command }}
+          {{- end }}
+          imagePullPolicy: {{ .Values.container.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.container.port | default 9000  }}
+              protocol: TCP
+          resources:
+          {{- if not .Values.resources }}
+            requests:
+              cpu: 100m
+              memory: 512Mi
+              ephemeral-storage: 128Mi
+            limits:
+              memory: 512Mi
+              ephemeral-storage: 1500Mi
+          {{- else }}
+            {{- with .Values.resources }}
+            requests:
+            {{- if .requests }}
+              {{- if .requests.cpu }}
+              cpu: {{ .requests.cpu }}
+              {{- else }}
+              cpu: 100m
+              {{- end }}
+              {{- if .requests.memory }}
+              memory: {{ .requests.memory }}
+              {{- else }}
+              memory: 512Mi
+              {{- end }}
+              {{- if .requests.ephemeralStorage }}
+              ephemeral-storage: {{ .requests.ephemeralStorage }}
+              {{- else }}
+              ephemeral-storage: 128Mi
+              {{- end }}
+            {{- else }}
+              cpu: 100m
+              memory: 512Mi
+              ephemeral-storage: 128Mi
+            {{- end }}
+
+            limits:
+            {{- if .limits }}
+              {{- if .limits.cpu }}
+              cpu: {{ .limits.cpu }}
+              {{- end }}
+              {{- if .limits.memory }}
+              memory: {{ .limits.memory }}
+              {{- else }}
+              memory: 512Mi
+              {{- end }}
+              {{- if .limits.ephemeralStorage }}
+              ephemeral-storage: {{ .limits.ephemeralStorage }}
+              {{- else }}
+              ephemeral-storage: 1500Mi
+              {{- end }}
+            {{- else }}
+              memory: 512Mi
+              ephemeral-storage: 1500Mi
+            {{- end }}
+
+            {{- end }}
+
+          {{- end }}
+{{- end }}

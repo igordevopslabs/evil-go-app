@@ -1,0 +1,44 @@
+repositories:
+  - name: paradis-app
+    url: git+ssh://git@github.com/igordevopslabs/paradis-charts@repo?ref=main&sparse=0
+
+helmDefaults:
+  tillerless: true
+  wait: true
+  timeout: 300
+  atomic: true
+  
+templates:
+  default: &default
+    namespace: evil-go-app
+    chart: ./charts/paradis-app
+    hooks:
+      - events: ['prepare']
+        command: "rm"
+        args: ["-rf", "./charts/"]
+      - events: ['prepare']
+        command: "helm"
+        args: ["fetch", "paradis-app/paradis-app", "--untar", "-d", "charts/"]
+      - events: ['prepare']
+        command: "sed"
+        args: ["-i", "-e", "$aappVersion: {{`{{ .Values.version }}`}}", "charts/paradis-app/Chart.yaml"]
+
+releases:
+  - name: evil-go-app-api
+    <<: *default
+    values:
+      - values/base.yaml.gotmpl
+
+environments:
+  homolog:
+    values:
+      - values/version.yaml
+      - values/HOMOLOG.yaml
+  sandbox:
+    values:
+      - values/version.yaml
+      - values/SANDBOX.yaml
+  production:
+    values:
+      - values/version.yaml
+      - values/PRODUCTION.yaml
