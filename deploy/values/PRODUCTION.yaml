@@ -1,4 +1,4 @@
-replicaCount: 1000
+replicaCount: 3
 
 service:
   type: Loadbalancer
