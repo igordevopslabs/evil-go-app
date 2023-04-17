@@ -38,7 +38,3 @@ environments:
     values:
       - values/version.yaml
       - values/SANDBOX.yaml
-  production:
-    values:
-      - values/version.yaml
-      - values/PRODUCTION.yaml
