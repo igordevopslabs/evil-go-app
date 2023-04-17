@@ -3,7 +3,7 @@ name: Build and Publish
 on:
   push:
     branches:
-      - main
+      - master
 
 env:
   DOCKER_USER: ${{secrets.DOCKER_USER}}
