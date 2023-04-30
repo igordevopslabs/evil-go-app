@@ -1,4 +1,6 @@
 {
+    "aws_access_key_id": "AKIAIOSFODNN7EXAMPLE",
+    "aws_access_secret_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
     "SchemaVersion": 2,
     "ArtifactName": "evil-go-app-test:v1",
     "ArtifactType": "container_image",
