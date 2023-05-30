@@ -1,6 +1,6 @@
 FROM golang:1.14.3 as builder
 
-#avoid root
+#avoid root again
 ENV USER=appuser 
 ENV UID=10001
 
