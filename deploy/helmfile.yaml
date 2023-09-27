@@ -42,3 +42,7 @@ environments:
     values:
       - values/version.yaml
       - values/PRODUCTION.yaml
+  development:
+    values:
+      - values/version.yaml
+      - values/DEVELOPMENT.yaml
