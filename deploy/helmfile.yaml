@@ -3,7 +3,6 @@ repositories:
     url: git+ssh://git@github.com/igordevopslabs/paradis-charts@repo?ref=main&sparse=0
 
 helmDefaults:
-  tillerless: true
   wait: true
   timeout: 300
   atomic: true
